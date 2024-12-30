@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抓小貓遊戲</title>
+  <style>
+  body {
+    text-align: center;
+    background: url('./背景800x600.png')  no-repeat center;
+    background-size: 1600px 1200px;
+  }
+
+  h1 {
+    color: dimgray;
+  }
+
+  p {
+    font-family: "微軟正黑體";
+    font-weight: bolder;
+    color: darkcyan;
+  }
+
+  .arrow {
+    position: absolute;
+    left: 810px;
+    bottom: 195px;
+  }
+
+    #game {
+      width: 500px;
+      height: 500px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.5);
+      border: 5px dashed pink;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cat {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #start_button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      background: palegoldenrod;
+      color: darkseagreen;
+      border-radius: 10px;
+      border: 3px double darkgreen;
+    }
+    #score {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>成為鏟屎官</h1>
+  <p>☆在 15 秒內盡可能抓越多小貓☆</p>
+  <div id="game"></div>
+  <div><img class="arrow" src="./arrrow.png" width="50px" height="50px"></div>
+  <button id="start_button">START</button>
+  <p id="score">抓到的小貓數：0</p>
+
+  <script>
+    // 獲取 HTML 元素
+const gameArea = document.getElementById('game');
+const startButton = document.getElementById('start_button');
+const scoreDisplay = document.getElementById('score');
+
+// 遊戲變數
+let score = 0;
+let isGameRunning = false;
+let gameTimer = null;
+
+// 隨機生成小貓位置
+const getRandomPosition = () => ({
+  x: Math.random() * (gameArea.offsetWidth - 50),
+  y: Math.random() * (gameArea.offsetHeight - 50),
+});
+
+// 創建一隻小貓
+function createCat() {
+  const cat = document.createElement('img');
+  cat.src = './貓咪2.png' ; 
+  cat.classList.add('cat');
+
+  // 隨機位置
+  const { x, y } = getRandomPosition();
+  cat.style.left = `${x}px`;
+  cat.style.top = `${y}px`;
+
+  // 點擊小貓事件
+  cat.addEventListener('click', () => {
+    if (isGameRunning) {
+      score++;
+      scoreDisplay.textContent = `抓到的小貓數：${score}`;
+      cat.remove(); // 點擊後移除小貓
+    }
+  });
+
+  gameArea.appendChild(cat);
+
+  // 設置小貓 2 秒後自動消失
+  setTimeout(() => {
+    if (cat.parentElement) {
+      cat.remove();
+    }
+  }, 2000);
+}
+
+// 開始遊戲
+startButton.addEventListener('click', () => {
+  if (isGameRunning) return;
+
+  
+  score = 0;
+  score.textContent = `抓到的小貓數：${score}`;
+  isGameRunning = true;
+
+  
+  let timeLeft = 15;
+  startButton.textContent = `剩餘時間：${timeLeft} 秒`;
+  gameTimer = setInterval(() => {
+    timeLeft--;
+    startButton.textContent = `剩餘時間：${timeLeft} 秒`;
+
+    if (timeLeft <= 0) {
+      clearInterval(gameTimer);
+      isGameRunning = false;
+      startButton.textContent = '開始遊戲';
+      alert(`遊戲結束！你抓到了 ${score} 隻小貓！`);
+    }
+  }, 1000);
+
+  const catSpawner = setInterval(() => {
+    if (!isGameRunning) {
+      clearInterval(catSpawner);
+      return;
+    }
+    createCat();
+  }, 500);
+});
+
+
+
+  </script>
+</body>
+</html>
